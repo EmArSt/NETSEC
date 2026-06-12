@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 # Setup DNS for some Network NS'
-for i in Router1 Router2 DMZ Client1;
+for i in Router1 Router2 DMZ Client1 Backup;
 do
     ip netns pids $i | xargs kill 2> /dev/null
     ip netns del $i 2>/dev/null

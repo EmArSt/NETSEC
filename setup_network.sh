@@ -24,6 +24,7 @@ ip netns add Router1
 ip netns add Router2
 ip netns add DMZ
 ip netns add Client1
+ip netns add Backup
 
 ip link add name br0 type bridge
 ip link add name br1 type bridge
@@ -36,6 +37,7 @@ ip link add dmz     type veth peer name br0-dmz
 ip link add r2-lan0 type veth peer name br0-r2
 ip link add r2-lan1 type veth peer name br1-r2
 ip link add client  type veth peer name br1-client
+ip link add bu      type veth peer name r2-bu
 
 # Move ends into namespaces
 ip link set r1-wan  netns Router1
@@ -44,6 +46,8 @@ ip link set dmz     netns DMZ
 ip link set r2-lan0 netns Router2
 ip link set r2-lan1 netns Router2
 ip link set client  netns Client1
+ip link set bu      netns Backup
+ip link set r2-bu   netns Router2
 
 # Plug bridge-side ends into bridges
 ip link set br0-r1     master br0
@@ -60,6 +64,7 @@ ip link set br0-r2     up
 ip link set br1-r2     up
 ip link set br1-client up
 
+
 # Bring up interfaces inside namespaces
 ip netns exec Router1 ip link set lo      up
 ip netns exec Router1 ip link set r1-wan  up
@@ -71,9 +76,13 @@ ip netns exec DMZ     ip link set dmz     up
 ip netns exec Router2 ip link set lo      up
 ip netns exec Router2 ip link set r2-lan0 up
 ip netns exec Router2 ip link set r2-lan1 up
+ip netns exec Router2 ip link set r2-bu   up
 
 ip netns exec Client1 ip link set lo      up
 ip netns exec Client1 ip link set client  up
+
+ip netns exec Backup  ip link set lo      up
+ip netns exec Backup  ip link set bu      up
 
 #Assign addresses
 ip addr add 203.0.113.1/30  dev inet
@@ -87,12 +96,16 @@ ip netns exec DMZ     ip addr  add 10.20.30.10/24 dev dmz
 
 ip netns exec Router2 ip addr  add 10.20.30.2/24  dev r2-lan0
 ip netns exec Router2 ip addr  add 10.20.31.1/24  dev r2-lan1
+ip netns exec Router2 ip addr  add 10.20.33.1/24  dev r2-bu
 
 ip netns exec Client1 ip addr  add 10.20.31.10/24 dev client
 ip netns exec Client1 ip route add default via 10.20.31.1
 
+ip netns exec Backup  ip addr add 10.20.33.2/24 dev bu
+ip netns exec Backup  ip route add default via 10.20.33.1
+
 # Setup DNS for some Network NS'
-for i in Client1 DMZ;
+for i in Client1 DMZ Backup;
 do
     mkdir -p /etc/netns/$i
     cat > /etc/netns/$i/resolv.conf << 'EOF'
