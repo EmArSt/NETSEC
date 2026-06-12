@@ -9,6 +9,8 @@ done
 ip link del br0      2>/dev/null
 ip link del br1      2>/dev/null
 ip link del inet     2>/dev/null
+ip link del wg1      2>/dev/null
+
 #!!!!!!!! Very dangorous !!!!!!!
 rm -r /etc/netns #             !
 #!!!!!!!! Comment out !!!!!!!!!!

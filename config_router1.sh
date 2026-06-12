@@ -32,4 +32,4 @@ ip route add default        via 203.0.113.1
 
 
 # Firewall
-iptables -P FORWARD ACCEPT # REMOVE BEFORE FIGHT
+iptables -P FORWARD ACCEPT # REMOVE BEFORE FLIGHT

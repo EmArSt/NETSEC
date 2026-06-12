@@ -7,16 +7,14 @@ ip route add default        via 10.20.30.1
 # Web-Proxy
 tee /etc/squid/squid.conf 1>/dev/null << 'EOF'
 http_port 3128 intercept
+http_port 3129
 
-acl localnet1 src 10.20.31.0/24
-acl localnet2 src 10.20.32.0/24
-http_access allow localnet1
-http_access allow localnet2
+acl localnet src 10.20.31.0/24
+
+http_access allow localnet
 http_access deny all
-http_reply_access allow all
 
 cache_mem 256 MB
-
 dns_nameservers 10.20.30.10
 EOF
 
@@ -40,7 +38,6 @@ AllowedIPs = 10.20.32.50/32
 EOF
 
 wg-quick up wg0
-sysctl -w net.ipv4.conf.r2-lan1.proxy_arp=1
 
 # Firewall
-iptables -P FORWARD ACCEPT # REMOVE BEFORE FIGHT
+iptables -P FORWARD ACCEPT # REMOVE BEFORE FLIGHT
