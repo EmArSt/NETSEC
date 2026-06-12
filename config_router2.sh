@@ -10,6 +10,7 @@ http_port 3128 intercept
 http_port 3129
 
 acl localnet src 10.20.31.0/24
+acl localnet src 10.20.32.0/24
 
 http_access allow localnet
 http_access deny all
@@ -19,6 +20,7 @@ dns_nameservers 10.20.30.10
 EOF
 
 iptables -t nat -A PREROUTING -i r2-lan1 -p tcp --dport 80 -j REDIRECT --to-port 3128
+iptables -t nat -A PREROUTING -i wg0 -p tcp --dport 80 -j REDIRECT --to-port 3128
 squid
 
 # Wireguard
